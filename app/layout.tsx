@@ -1,5 +1,4 @@
 import { AppHeader } from "@/components/AppHeader";
-import { TodoProvider } from "@/context/TodoProvider";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -17,10 +16,8 @@ export default function RootLayout({
     <html lang="en" className="h-full antialiased">
       <body className="relative flex min-h-full flex-col text-foreground">
         <div className="board-bg" aria-hidden="true" />
-        <TodoProvider>
-          <AppHeader />
-          <main className="relative flex flex-1 flex-col">{children}</main>
-        </TodoProvider>
+        <AppHeader />
+        <main className="relative flex flex-1 flex-col">{children}</main>
       </body>
     </html>
   );

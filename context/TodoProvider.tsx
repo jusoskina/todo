@@ -94,11 +94,19 @@ export function TodoProvider({ children }: { children: ReactNode }) {
     async function load() {
       try {
         let loaded = await fetchAppState();
+        if (!loaded) {
+          if (!cancelled) setHydrated(true);
+          return;
+        }
+
         const local = loadLocalState();
 
         if (loaded.items.length === 0 && local && local.items.length > 0) {
-          loaded = await importAppState(local);
-          clearLocalState();
+          const imported = await importAppState(local);
+          if (imported) {
+            loaded = imported;
+            clearLocalState();
+          }
         }
 
         if (!cancelled) {
