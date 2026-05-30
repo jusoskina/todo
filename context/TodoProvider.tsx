@@ -11,7 +11,8 @@ import {
 } from "react";
 import { nextWeekKey, todayDayKey, todayWeekKey, tomorrowDayKey } from "@/lib/dates";
 import { processRollovers } from "@/lib/rollover";
-import { loadState, saveState } from "@/lib/storage";
+import { clearLocalState, loadLocalState } from "@/lib/storage";
+import { fetchAppState, importAppState, persistAppState } from "@/lib/todo-actions";
 import {
   createItem,
   dayItems,
@@ -81,20 +82,58 @@ export function TodoProvider({ children }: { children: ReactNode }) {
     lastProcessedDayKey: todayDayKey(),
   }));
   const [hydrated, setHydrated] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const dayKey = todayDayKey();
   const weekKey = todayWeekKey();
   const nextWeekKeyValue = nextWeekKey();
 
   useEffect(() => {
-    const loaded = loadState();
-    setState(loaded);
-    setHydrated(true);
+    let cancelled = false;
+
+    async function load() {
+      try {
+        let loaded = await fetchAppState();
+        const local = loadLocalState();
+
+        if (loaded.items.length === 0 && local && local.items.length > 0) {
+          loaded = await importAppState(local);
+          clearLocalState();
+        }
+
+        if (!cancelled) {
+          setState(loaded);
+          setHydrated(true);
+        }
+      } catch (error) {
+        console.error("[todo] failed to load state", error);
+        if (!cancelled) {
+          setHydrated(true);
+          setSaveError("Could not load your todos.");
+        }
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
     if (!hydrated) return;
-    saveState(state);
+
+    const timeout = window.setTimeout(async () => {
+      try {
+        await persistAppState(state);
+        setSaveError(null);
+      } catch (error) {
+        console.error("[todo] failed to save state", error);
+        setSaveError("Could not save changes.");
+      }
+    }, 400);
+
+    return () => window.clearTimeout(timeout);
   }, [state, hydrated]);
 
   useEffect(() => {
@@ -379,13 +418,22 @@ export function TodoProvider({ children }: { children: ReactNode }) {
 
   if (!hydrated) {
     return (
-      <div className="flex min-h-full flex-1 items-center justify-center text-sm text-zinc-500">
+      <div className="flex min-h-full flex-1 items-center justify-center text-sm text-muted">
         Loading…
       </div>
     );
   }
 
-  return <TodoContext.Provider value={value}>{children}</TodoContext.Provider>;
+  return (
+    <TodoContext.Provider value={value}>
+      {saveError ? (
+        <p className="bg-red-50 px-4 py-2 text-center text-xs font-medium text-red-700">
+          {saveError}
+        </p>
+      ) : null}
+      {children}
+    </TodoContext.Provider>
+  );
 }
 
 export function useTodos() {
