@@ -38,6 +38,8 @@ export function MainBoard() {
     addItem,
     toggleDone,
     deleteItem,
+    moveToFuture,
+    moveToNextWeek,
     moveToToday,
     reorderInColumn,
     moveBetweenColumns,
@@ -99,11 +101,12 @@ export function MainBoard() {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-2 p-2">
+      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-3 p-3 pb-6">
         <TodoColumn
           id="today"
           title={weekday}
           subtitle={date}
+          accent="#2a6f8f"
           items={todayItems}
           archivedItems={earlierDone}
           showArchivedLabel
@@ -111,29 +114,37 @@ export function MainBoard() {
           addPlaceholder="Add to today…"
           onToggle={toggleDone}
           onDelete={deleteItem}
+          onMoveToFuture={moveToFuture}
+          onMoveToNextWeek={moveToNextWeek}
         />
 
         <TodoColumn
           id={tomorrowColumnId}
           title={tomorrowHeading.title}
           subtitle={tomorrowHeading.subtitle}
+          accent="#3d7a9a"
           items={tomorrowItems}
           onAdd={(title) => addItem(title, "day", null, tomorrowKey)}
           addPlaceholder="Add to tomorrow…"
           onToggle={toggleDone}
           onDelete={deleteItem}
+          onMoveToFuture={moveToFuture}
+          onMoveToNextWeek={moveToNextWeek}
         />
 
         <TodoColumn
           id="week"
           title="This week"
           subtitle={formatWeekRange(weekKey)}
+          accent="#1e5f7a"
           items={weekList}
           onAdd={(title) => addItem(title, "week")}
           addPlaceholder="Add to this week…"
           onToggle={toggleDone}
           onDelete={deleteItem}
           onMoveToToday={moveToToday}
+          onMoveToFuture={moveToFuture}
+          onMoveToNextWeek={moveToNextWeek}
         />
       </div>
 

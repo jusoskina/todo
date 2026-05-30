@@ -15,10 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="flex min-h-full flex-col bg-zinc-100 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+      <body className="relative flex min-h-full flex-col text-foreground">
+        <div className="board-bg" aria-hidden="true" />
         <TodoProvider>
           <NavBar />
-          {children}
+          <main className="relative flex flex-1 flex-col">{children}</main>
         </TodoProvider>
       </body>
     </html>

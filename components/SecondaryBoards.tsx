@@ -36,8 +36,8 @@ export function FutureBoard() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl flex-1 p-4">
-      <p className="mb-4 text-sm text-zinc-500">
+    <div className="mx-auto max-w-lg flex-1 p-3 pb-6">
+      <p className="mb-3 text-sm text-muted">
         A backlog of todos with no date. Move items to this week when you are
         ready to schedule them.
       </p>
@@ -45,6 +45,7 @@ export function FutureBoard() {
         <TodoColumn
           id="future"
           title="Future"
+          accent="#3d7a9a"
           items={list}
           onAdd={(title) => addItem(title, "future")}
           addPlaceholder="Add a future todo…"
@@ -82,8 +83,8 @@ export function NextWeekBoard() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl flex-1 p-4">
-      <p className="mb-4 text-sm text-zinc-500">
+    <div className="mx-auto max-w-lg flex-1 p-3 pb-6">
+      <p className="mb-3 text-sm text-muted">
         Items planned for next week ({formatWeekRange(nextWeekKeyValue)}). At the
         start of next week they become part of your weekly list. Incomplete items
         from this week also roll here automatically.
@@ -93,6 +94,7 @@ export function NextWeekBoard() {
           id="next-week"
           title="Next week"
           subtitle={formatWeekRange(nextWeekKeyValue)}
+          accent="#2a6f8f"
           items={list}
           onAdd={(title) => addItem(title, "next-week")}
           addPlaceholder="Add to next week…"

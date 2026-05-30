@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { href: "/", label: "Home" },
+  { href: "/", label: "Board" },
   { href: "/future", label: "Future" },
   { href: "/next-week", label: "Next week" },
   { href: "/history", label: "History" },
@@ -14,20 +14,25 @@ export function NavBar() {
   const pathname = usePathname();
 
   return (
-    <nav className="border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
-      <div className="mx-auto flex max-w-6xl items-center gap-1 px-4 py-3">
-        <span className="mr-4 text-sm font-semibold tracking-tight">Todo</span>
+    <nav className="trello-nav sticky top-0 z-50" aria-label="Main navigation">
+      <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-2.5">
+        <span className="mr-3 flex items-center gap-2 text-sm font-bold text-foreground">
+          <span
+            className="flex h-6 w-6 items-center justify-center rounded bg-baby-blue-dark text-xs text-white"
+            aria-hidden="true"
+          >
+            ✓
+          </span>
+          Todo
+        </span>
         {links.map((link) => {
           const active = pathname === link.href;
           return (
             <Link
               key={link.href}
               href={link.href}
-              className={`rounded-md px-3 py-1.5 text-sm transition-colors ${
-                active
-                  ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-                  : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900"
-              }`}
+              aria-current={active ? "page" : undefined}
+              className={`nav-link ${active ? "nav-link-active" : "nav-link-inactive"}`}
             >
               {link.label}
             </Link>

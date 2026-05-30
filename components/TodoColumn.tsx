@@ -13,6 +13,7 @@ interface TodoColumnProps {
   id: string;
   title: string;
   subtitle?: string;
+  accent?: string;
   items: TodoItem[];
   archivedItems?: TodoItem[];
   onAdd?: (title: string) => void;
@@ -33,6 +34,7 @@ export function TodoColumn({
   id,
   title,
   subtitle,
+  accent = "#2a6f8f",
   items,
   archivedItems = [],
   onAdd,
@@ -55,27 +57,37 @@ export function TodoColumn({
   return (
     <section
       ref={setNodeRef}
-      className={`flex flex-col rounded-md border transition-colors ${
-        compact ? "p-1.5" : "p-2"
-      } ${
-        isOver
-          ? "border-blue-400 bg-blue-50/50 dark:border-blue-700 dark:bg-blue-950/20"
-          : "border-zinc-200 bg-zinc-50/80 dark:border-zinc-800 dark:bg-zinc-900/40"
-      }`}
+      className={`trello-column flex flex-col transition-colors ${
+        compact ? "p-2" : "p-2.5"
+      } ${isOver ? "trello-column-drag-over" : ""}`}
     >
-      <header className={compact ? "mb-1" : "mb-1.5"}>
-        <h2 className={`font-semibold leading-tight ${compact ? "text-xs" : "text-sm"}`}>
-          {title}
-        </h2>
-        {subtitle && (
-          <p className={`text-zinc-500 ${compact ? "text-[10px]" : "text-xs"}`}>{subtitle}</p>
-        )}
+      <header className={`flex items-start gap-2 ${compact ? "mb-1.5" : "mb-2"}`}>
+        <span
+          className="mt-1.5 h-2 w-8 shrink-0 rounded-full"
+          style={{ backgroundColor: accent }}
+        />
+        <div>
+          <h2
+            className={`font-bold leading-tight text-foreground ${
+              compact ? "text-xs" : "text-sm"
+            }`}
+          >
+            {title}
+          </h2>
+          {subtitle && (
+            <p className={`text-muted ${compact ? "text-[10px]" : "text-xs"}`}>
+              {subtitle}
+            </p>
+          )}
+        </div>
       </header>
 
       <SortableContext items={sortableIds} strategy={verticalListSortingStrategy}>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1.5">
           {items.length === 0 && archivedItems.length === 0 && (
-            <p className={`text-zinc-400 ${compact ? "text-[10px]" : "text-xs"}`}>Empty</p>
+            <p className={`text-muted-light ${compact ? "text-[10px]" : "text-xs"}`}>
+              No cards yet
+            </p>
           )}
           {items.map((item) => (
             <TodoItemCard
@@ -99,13 +111,13 @@ export function TodoColumn({
       </SortableContext>
 
       {archivedItems.length > 0 && (
-        <div className="mt-2 border-t border-zinc-200 pt-1.5 dark:border-zinc-800">
+        <div className="mt-2 border-t border-baby-blue/30 pt-2">
           {showArchivedLabel && (
-            <p className="mb-1 text-[10px] font-medium uppercase tracking-wide text-zinc-400">
+            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-light">
               Done earlier
             </p>
           )}
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1.5">
             {archivedItems.map((item) => (
               <StaticTodoItemCard key={item.id} item={item} showDayLabel />
             ))}

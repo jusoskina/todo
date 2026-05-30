@@ -1,7 +1,9 @@
 "use client";
 
+import { useRef } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { celebrateAtElement } from "@/lib/celebration";
 import { formatDisplayDate } from "@/lib/dates";
 import type { TodoItem } from "@/lib/types";
 
@@ -32,6 +34,8 @@ export function TodoItemCard({
   onMoveToToday,
   onMoveToTomorrow,
 }: TodoItemCardProps) {
+  const checkboxRef = useRef<HTMLInputElement>(null);
+
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({
       id: item.id,
@@ -46,24 +50,35 @@ export function TodoItemCard({
   const isDone = item.done;
   const isRolled = showRolledOver && item.rolledOver && !isDone;
 
+  function handleToggle() {
+    if (!isDone) {
+      celebrateAtElement(checkboxRef.current);
+      checkboxRef.current?.classList.add("trello-checkbox-pop");
+      window.setTimeout(() => {
+        checkboxRef.current?.classList.remove("trello-checkbox-pop");
+      }, 350);
+    }
+    onToggle();
+  }
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className={`group flex items-start gap-1 rounded border px-1.5 py-1 text-xs ${
-        isDragging ? "opacity-50" : ""
+      className={`group flex items-start gap-1.5 px-2 py-1.5 text-xs ${
+        isDragging ? "opacity-60" : ""
       } ${
         isDone
-          ? "border-zinc-200 bg-zinc-50 text-zinc-400 dark:border-zinc-800 dark:bg-zinc-900/50"
+          ? "trello-card trello-card-done text-muted-light"
           : isRolled
-            ? "border-orange-300 bg-orange-50 dark:border-orange-800 dark:bg-orange-950/40"
-            : "border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
+            ? "trello-card trello-card-rolled"
+            : "trello-card"
       }`}
     >
       {draggable && (
         <button
           type="button"
-          className="mt-px cursor-grab touch-none text-[10px] text-zinc-300 hover:text-zinc-500 active:cursor-grabbing dark:text-zinc-600"
+          className="mt-0.5 cursor-grab touch-none text-[10px] text-baby-blue-dark/40 hover:text-baby-blue-dark active:cursor-grabbing"
           aria-label="Drag to reorder"
           {...attributes}
           {...listeners}
@@ -72,38 +87,31 @@ export function TodoItemCard({
         </button>
       )}
       <input
+        ref={checkboxRef}
         type="checkbox"
         checked={isDone}
-        onChange={onToggle}
-        className="mt-px h-3 w-3 shrink-0 rounded border-zinc-300"
+        onChange={handleToggle}
+        className="trello-checkbox mt-0.5"
       />
       <div className="min-w-0 flex-1">
-        <p className={`break-words ${isDone ? "line-through" : ""}`}>{item.title}</p>
+        <p className={`break-words leading-snug ${isDone ? "line-through" : "text-foreground"}`}>
+          {item.title}
+        </p>
         {showDayLabel && item.dayKey && (
-          <p className="mt-0.5 text-xs text-zinc-400">
+          <p className="mt-0.5 text-[10px] text-muted-light">
             {formatDisplayDate(item.dayKey).weekday}, {formatDisplayDate(item.dayKey).date}
           </p>
         )}
         {isRolled && (
-          <p className="text-[10px] font-medium text-orange-600 dark:text-orange-400">
-            Rolled over
-          </p>
+          <p className="text-[10px] font-semibold text-[#b45309]">Rolled over</p>
         )}
       </div>
       <div className="flex shrink-0 flex-wrap justify-end gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-        {onMoveToToday && (
-          <ActionButton label="Today" onClick={onMoveToToday} />
-        )}
+        {onMoveToToday && <ActionButton label="Today" onClick={onMoveToToday} />}
         {onMoveToWeek && <ActionButton label="Week" onClick={onMoveToWeek} />}
-        {onMoveToTomorrow && (
-          <ActionButton label="Tmrw" onClick={onMoveToTomorrow} />
-        )}
-        {onMoveToNextWeek && (
-          <ActionButton label="Next wk" onClick={onMoveToNextWeek} />
-        )}
-        {onMoveToFuture && (
-          <ActionButton label="Future" onClick={onMoveToFuture} />
-        )}
+        {onMoveToTomorrow && <ActionButton label="Tmrw" onClick={onMoveToTomorrow} />}
+        {onMoveToNextWeek && <ActionButton label="Next wk" onClick={onMoveToNextWeek} />}
+        {onMoveToFuture && <ActionButton label="Future" onClick={onMoveToFuture} />}
         <ActionButton label="Delete" onClick={onDelete} danger />
       </div>
     </div>
@@ -123,10 +131,10 @@ function ActionButton({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded px-1 py-px text-[9px] font-medium uppercase tracking-wide ${
+      className={`action-btn rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide transition-colors ${
         danger
-          ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
-          : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+          ? "text-red-700 hover:bg-red-50"
+          : "text-baby-blue-dark hover:bg-baby-blue-light"
       }`}
     >
       {label}
@@ -142,10 +150,10 @@ export function StaticTodoItemCard({
   showDayLabel?: boolean;
 }) {
   return (
-    <div className="rounded border border-zinc-200 bg-zinc-50 px-1.5 py-1 text-xs text-zinc-400 line-through dark:border-zinc-800 dark:bg-zinc-900/50">
+    <div className="trello-card trello-card-done px-2 py-1.5 text-xs text-muted-light line-through">
       <p className="break-words">{item.title}</p>
       {showDayLabel && item.dayKey && (
-        <p className="mt-0.5 text-xs">
+        <p className="mt-0.5 text-[10px] no-underline">
           {formatDisplayDate(item.dayKey).weekday}, {formatDisplayDate(item.dayKey).date}
         </p>
       )}

@@ -18,13 +18,13 @@ export function AddTodoForm({ placeholder, onAdd }: AddTodoFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-1">
+    <form onSubmit={handleSubmit} className="mt-2">
       <input
         type="text"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded border border-zinc-200 bg-white px-1.5 py-1 text-xs outline-none ring-zinc-400 focus:ring-1 dark:border-zinc-700 dark:bg-zinc-900"
+        className="trello-input w-full px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-light"
       />
     </form>
   );
