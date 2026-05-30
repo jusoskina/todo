@@ -1,4 +1,4 @@
-import { NavBar } from "@/components/NavBar";
+import { AppHeader } from "@/components/AppHeader";
 import { TodoProvider } from "@/context/TodoProvider";
 import type { Metadata } from "next";
 import "./globals.css";
@@ -18,7 +18,7 @@ export default function RootLayout({
       <body className="relative flex min-h-full flex-col text-foreground">
         <div className="board-bg" aria-hidden="true" />
         <TodoProvider>
-          <NavBar />
+          <AppHeader />
           <main className="relative flex flex-1 flex-col">{children}</main>
         </TodoProvider>
       </body>
